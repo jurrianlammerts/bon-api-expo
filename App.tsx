@@ -30,9 +30,12 @@ export default function App() {
 
   const _handlePressButtonAsync = async () => {
     const url = recipeData?.grocery_widget_url;
+    const fallBackUrl = "https://www.bon-api.com/en/";
     // open the link in a in-app browser
     if (url) {
       await WebBrowser.openBrowserAsync(url);
+    } else {
+      await WebBrowser.openBrowserAsync(fallBackUrl);
     }
   };
 
@@ -61,7 +64,7 @@ export default function App() {
       <Button
         title="Order recipe"
         // disable button if the recipe link is not available
-        disabled={!recipeData?.show_widget_button}
+        disabled={recipeData ? !recipeData.show_widget_button : false}
         onPress={_handlePressButtonAsync}
         color="#259137"
       />
