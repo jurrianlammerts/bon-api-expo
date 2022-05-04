@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Button, View, StyleSheet, Image } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import * as WebBrowser from "expo-web-browser";
 
 const process = {
@@ -8,22 +14,28 @@ const process = {
   },
 };
 
+type RecipeData = {
+  grocery_widget_url: string;
+  delivery_partner_logos: string;
+  show_widget_button: boolean;
+};
+
 export default function App() {
-  const [recipeData, setRecipeData] = useState<{
-    grocery_widget_url: string;
-    delivery_partner_logos: string;
-    show_widget_button: boolean;
-  }>();
+  const [loading, setLoading] = useState(true);
+  const [recipeData, setRecipeData] = useState<RecipeData>();
 
   // call the fetch function on mount with the id
   useEffect(() => {
+    setLoading(true);
+
     async function fetchData() {
       const response = await getRecipeData("11004", "Widget inApp Testing");
-
-      console.log("response", response);
       setRecipeData(response);
     }
+
     fetchData();
+
+    setLoading(false);
   }, []);
 
   const _handlePressButtonAsync = async () => {
@@ -52,6 +64,14 @@ export default function App() {
       requestOptions
     ).then((data) => data.json());
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
