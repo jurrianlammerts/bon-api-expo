@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, View, StyleSheet } from "react-native";
+import { Button, View, StyleSheet, Image } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 
 const process = {
   env: {
-    userName: "d47751abd4e8f72e",
-    password:
-      "9eb993127fc7bd06b21ab13995dc04435afa136d19d1fc7666113cff45701156",
-    authHeader:
-      "hizhdQE8OG4TYfAOaIpMlIUkidIU1O5SQJWhCfk:T2arF7wXKrooUWzYI64tw8mdjg376zmJ439CawrZ3qt3x9WHCSsJNywYw0D5XMjsbwhFCtLKVleUhLnDctvCzUCD6MQF46MA4z3qqN1iNl7evAHTjAJSPsZmAQAhdD14",
+    authHeader: "344f1e6e60b59946a4429f6a4b72ea9cd1b13d64",
   },
 };
 
@@ -23,6 +19,8 @@ export default function App() {
   useEffect(() => {
     async function fetchData() {
       const response = await getRecipeData("11004", "Widget inApp Testing");
+
+      console.log("response", response);
       setRecipeData(response);
     }
     fetchData();
@@ -30,12 +28,9 @@ export default function App() {
 
   const _handlePressButtonAsync = async () => {
     const url = recipeData?.grocery_widget_url;
-    const fallBackUrl = "https://www.bon-api.com/en/";
     // open the link in a in-app browser
     if (url) {
       await WebBrowser.openBrowserAsync(url);
-    } else {
-      await WebBrowser.openBrowserAsync(fallBackUrl);
     }
   };
 
@@ -45,26 +40,38 @@ export default function App() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Token ${process.env.authHeader}`,
       },
-      Authorization: `Basic ${process.env.authHeader}`,
       body: JSON.stringify({
-        userName: process.env.userName,
-        password: process.env.password,
-        recipeID: id,
-        recipeName: recipeName,
+        recipe_id: id,
+        recipe_name: recipeName,
       }),
     };
-    return await fetch("https://bon-api.com/o/token/", requestOptions).then(
-      (data) => data.json()
-    );
+    return await fetch(
+      "https://bon-api.com/api/v1/grocery/delivery/app/recipe-check/",
+      requestOptions
+    ).then((data) => data.json());
   };
 
   return (
     <View style={styles.container}>
+      {recipeData?.show_widget_button && (
+        <Image
+          source={{
+            uri: recipeData?.delivery_partner_logos,
+            width: 120,
+            height: 120,
+          }}
+        />
+      )}
       <Button
-        title="Order recipe"
+        title={
+          recipeData?.show_widget_button
+            ? "Order recipe"
+            : "No recipe available"
+        }
         // disable button if the recipe link is not available
-        disabled={recipeData ? !recipeData.show_widget_button : false}
+        disabled={!recipeData?.show_widget_button}
         onPress={_handlePressButtonAsync}
         color="#259137"
       />
