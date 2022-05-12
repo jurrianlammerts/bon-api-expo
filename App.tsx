@@ -79,7 +79,7 @@ export default function App() {
         <Image
           source={{
             uri: recipeData?.delivery_partner_logos,
-            width: 120,
+            width: 240,
             height: 120,
           }}
         />
@@ -104,5 +104,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "white",
   },
 });
